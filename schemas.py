@@ -11,8 +11,8 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, HttpUrl
+from typing import Optional, List
 
 # Example schemas (replace with your own):
 
@@ -38,8 +38,28 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Blog app schemas
+
+class Sector(BaseModel):
+    name: str = Field(..., description="Sector name, e.g., Marketing, Sales")
+    slug: str = Field(..., description="URL-friendly unique identifier")
+    description: Optional[str] = Field(None, description="Short description of the sector")
+
+class Tool(BaseModel):
+    name: str = Field(..., description="Tool name")
+    sector_slug: str = Field(..., description="Slug of sector this tool belongs to")
+    summary: str = Field(..., description="Short tool summary")
+    strengths: List[str] = Field(default_factory=list, description="Key strengths")
+    limitations: List[str] = Field(default_factory=list, description="Known limitations")
+    website: Optional[HttpUrl] = Field(None, description="Official website")
+    pricing: Optional[str] = Field(None, description="Pricing summary")
+    rating: Optional[float] = Field(None, ge=0, le=5, description="Editor rating out of 5")
+
+class Comparison(BaseModel):
+    sector_slug: str = Field(..., description="Sector slug for this comparison")
+    headline: str = Field(..., description="Comparison headline")
+    intro: Optional[str] = Field(None, description="Intro paragraph")
+    top_tools: List[str] = Field(default_factory=list, description="List of tool names in ranked order")
 
 # Note: The Flames database viewer will automatically:
 # 1. Read these schemas from GET /schema endpoint
